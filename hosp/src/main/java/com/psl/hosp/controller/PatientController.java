@@ -1,6 +1,5 @@
 package com.psl.hosp.controller;
 
-import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,7 +12,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.psl.hosp.model.Patient;
 import com.psl.hosp.service.PatientService;
 
 @RestController
@@ -24,12 +22,12 @@ public class PatientController {
 	private PatientService patientService;
 	
 	@GetMapping("/getAll")
-	public List<Patient> getAllPatients(){
+	public Map<String, Object> getAllPatients(){
 		return patientService.getAllPatients();
 	}
 	
 	@GetMapping("/getById/{patientId}")
-	public Patient getPatientById(@PathVariable int patientId){
+	public Map<String, Object> getPatientById(@PathVariable int patientId){
 		return patientService.getPatientById(patientId);
 	}
 	

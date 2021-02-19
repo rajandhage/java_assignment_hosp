@@ -3,18 +3,18 @@ package com.psl.hosp.service;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import com.psl.hosp.dao.EncounterDao;
 import com.psl.hosp.dao.PatientDao;
+import com.psl.hosp.helper.EncounterServiceHelper;
 import com.psl.hosp.model.Encounter;
 import com.psl.hosp.model.Patient;
-import com.psl.hosp.utiliy.Utility;
 
 @Service
 public class EncounterService {
@@ -26,33 +26,40 @@ public class EncounterService {
 	private PatientDao patientDao;
 	
 	@Autowired
-	private Utility utility;
+	private EncounterServiceHelper encounterServiceHelper;
 	
-	public List<Encounter> getEncounterHistorybyPatient(int patientId) {
-		return encounterDao.findByPatientPatientId(patientId);
+	public Map<String, Object> getEncounterHistorybyPatient(int patientId) {
+		Map<String, Object> returnMap = new HashMap<String, Object>();
+		returnMap.put("statusCode", HttpStatus.OK);
+		returnMap.put("EncounterHistory" , encounterDao.findByPatientPatientId(patientId));
+		return returnMap;
 	}
 
-	public Encounter getEncounterbyId(int encounterId) {
+	public Map<String, Object> getEncounterbyId(int encounterId) {
 		Optional<Encounter> encounter = encounterDao.findById(encounterId);
+		Map<String, Object> returnMap = new HashMap<String, Object>();
 		if(!encounter.isPresent()) {
-			return null;
+			returnMap.put("statusCode", HttpStatus.NOT_FOUND);
+			return returnMap;
 		}
-		return encounter.get();
+		returnMap.put("statusCode", HttpStatus.OK);
+		returnMap.put("Encounter" ,encounter.get());
+		return returnMap;
 	}
 
 	public Map<String, Object> addEncounter(Map<String, Object> request) throws Exception {
-		utility.checkKeys(request, "dateOfEncounter", "timeOfEncounter", "triggerIssue", "diagnosis", "medicines", "billingAmount", "patientId");
-		utility.checkIfStringAndNonEmpty(request, "triggerIssue");
-		utility.checkIfString(request, "diagnosis", "medicines");
-		utility.checkIfDateValid(request.get("dateOfEncounter").toString().trim());
-		utility.checkIfTimeValid(request.get("timeOfEncounter").toString().trim());
-		utility.checkIfFloat(request, "billingAmount");
-		utility.checkIfInteger(request, "patientId");
 		
 		Map<String, Object> returnMap = new HashMap<String, Object>();
+		if(!encounterServiceHelper.checkValidityOfRequestForAdd(request)) {
+			returnMap.put("status", HttpStatus.BAD_REQUEST);
+			returnMap.put("message", "Check console for error");
+			return returnMap;
+		}
+		
 		int patientId = Integer.parseInt(request.get("patientId").toString().trim());
 		Optional<Patient> patientData = patientDao.findById(patientId);
 		if(!patientData.isPresent()) {
+			returnMap.put("statusCode", HttpStatus.NOT_FOUND);
 			returnMap.put("message", "No patient is present for patientId : " + patientId);
 			return returnMap;
 		}
@@ -70,9 +77,10 @@ public class EncounterService {
 			try {
 				Encounter encounter2 = encounterDao.save(encounter);
 				returnMap.put("message", "Encounter added to database with encounterId : " + encounter2.getEncounterId() + "for patient with patientId : " + patientId);
+				returnMap.put("statusCode", HttpStatus.CREATED);
 				return returnMap;
 			} catch (Exception e) {
-				// TODO: handle exception
+				returnMap.put("statusCode", HttpStatus.INTERNAL_SERVER_ERROR);
 				returnMap.put("message", "Add Encounter failed due to database operation failure");
 				return returnMap;
 			}
@@ -89,9 +97,11 @@ public class EncounterService {
 			synchronized (encounter) {
 				encounterDao.deleteById(encounterId);
 			}
+			returnMap.put("statusCode", HttpStatus.OK);
 			returnMap.put("message", "Encounter with id : " + encounterId + " Deleted");
 			return returnMap;
 		}else {
+			returnMap.put("statusCode", HttpStatus.NOT_FOUND);
 			returnMap.put("message", "No Encounter with encounterId " + encounterId +" is present");
 			return returnMap;
 		}
@@ -100,16 +110,16 @@ public class EncounterService {
 
 
 	public Map<String, Object> updateEncounter(Map<String, Object> request) throws Exception {
-		utility.checkKeys(request, "encounterId", "triggerIssue", "diagnosis", "medicines", "billingAmount");
-		utility.checkIfStringAndNonEmpty(request, "triggerIssue");
-		utility.checkIfString(request, "diagnosis", "medicines");
-		utility.checkIfFloat(request, "billingAmount");
-		utility.checkIfInteger(request, "encounterId");
 		Map<String, Object> returnMap = new HashMap<String, Object>();
-		
+		if(!encounterServiceHelper.checkValidityOfRequestForUpdate(request)) {
+			returnMap.put("status", HttpStatus.BAD_REQUEST);
+			returnMap.put("message", "Check console for error");
+			return returnMap;
+		}
 		int encounterId = Integer.parseInt(request.get("encounterId").toString());
 		Optional<Encounter> encounterData = encounterDao.findById(encounterId);
 		if(!encounterData.isPresent()) {
+			returnMap.put("statusCode", HttpStatus.NOT_FOUND);
 			returnMap.put("message", "No Encounter Record present for encounterId : " + Integer.parseInt(request.get("encounterId").toString()));
 			return returnMap;
 		}
@@ -122,9 +132,11 @@ public class EncounterService {
 		synchronized (encounter) {
 			try {
 				Encounter encounter2 = encounterDao.save(encounter);
+				returnMap.put("statusCode", HttpStatus.OK);
 				returnMap.put("message", "Encounter updated in database with encounterId : " + encounter2.getEncounterId() + "for patient with patientId : " + encounter2.getPatient().getPatientId());
 				return  returnMap;
 			} catch (Exception e) {
+				returnMap.put("statusCode", HttpStatus.INTERNAL_SERVER_ERROR);
 				returnMap.put("message", "Update Encounter failed due to database operation failure");
 				return returnMap;
 			}

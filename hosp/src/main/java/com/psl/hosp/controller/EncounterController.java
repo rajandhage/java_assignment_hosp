@@ -25,12 +25,12 @@ public class EncounterController {
 	private EncounterService encounterService;
 	
 	@GetMapping("/patientId/{patientId}")
-	public List<Encounter> getEncounterHistorybyPatient(@PathVariable("patientId") int patientId){
+	public Map<String, Object> getEncounterHistorybyPatient(@PathVariable("patientId") int patientId){
 		return encounterService.getEncounterHistorybyPatient(patientId);
 	}
 	
 	@GetMapping("/encounterId/{encounterId}")
-	public Encounter getEncounterbyId(@PathVariable("encounterId") int encounterId){
+	public  Map<String, Object> getEncounterbyId(@PathVariable("encounterId") int encounterId){
 		return encounterService.getEncounterbyId(encounterId);
 	}
 	
