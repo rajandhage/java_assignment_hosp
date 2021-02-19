@@ -52,7 +52,7 @@ public class EncounterService {
 		Map<String, Object> returnMap = new HashMap<String, Object>();
 		if(!encounterServiceHelper.checkValidityOfRequestForAdd(request)) {
 			returnMap.put("status", HttpStatus.BAD_REQUEST);
-			returnMap.put("message", "Check console for error");
+			returnMap.put("message", "Check Request format for all expectations . Check console for error");
 			return returnMap;
 		}
 		
@@ -113,7 +113,7 @@ public class EncounterService {
 		Map<String, Object> returnMap = new HashMap<String, Object>();
 		if(!encounterServiceHelper.checkValidityOfRequestForUpdate(request)) {
 			returnMap.put("status", HttpStatus.BAD_REQUEST);
-			returnMap.put("message", "Check console for error");
+			returnMap.put("message", "Check Request format for all expectations. Check console for error");
 			return returnMap;
 		}
 		int encounterId = Integer.parseInt(request.get("encounterId").toString());

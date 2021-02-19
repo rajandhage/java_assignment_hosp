@@ -39,7 +39,7 @@ public class PatientService {
 		
 		if(!patientServiceHelper.checkValidityOfRequestForAdd(request)) {
 			map.put("status", HttpStatus.BAD_REQUEST);
-			map.put("message", "Check console for error");
+			map.put("message", "Check Request format for all expectations. Check console for error");
 			return map;
 		}
 		String mailId = request.get("mailId").toString().trim();
@@ -118,7 +118,7 @@ public class PatientService {
 		Map<String, Object> returnMap = new HashMap<String, Object>();
 		if(!patientServiceHelper.checkValidityOfRequestForUpdate(request)) {
 			returnMap.put("status", HttpStatus.BAD_REQUEST);
-			returnMap.put("message", "Check console for error");
+			returnMap.put("message", "Check Request format for all expectations. Check console for error");
 			return returnMap;
 		}
 		int patientId = Integer.parseInt(request.get("patientId").toString().trim());
