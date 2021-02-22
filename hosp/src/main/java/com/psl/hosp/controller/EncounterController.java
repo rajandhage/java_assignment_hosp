@@ -34,7 +34,6 @@ public class EncounterController {
 		return encounterService.getEncounterbyId(encounterId);
 	}
 	
-	
 	@PostMapping("/addEncounter")
 	public Map<String, Object> addEncounter(@RequestBody Map<String, Object> request) throws Exception{
 		return encounterService.addEncounter(request);

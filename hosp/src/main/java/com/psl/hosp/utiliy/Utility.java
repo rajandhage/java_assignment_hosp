@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class Utility {
 	
-	public boolean checkKeys(Map<String, Object> request, String... keys) throws Exception {
+	public boolean checkKeys(Map<String, Object> request, String... keys)  {
 		for(String key : keys) 
 			if(!request.containsKey(key)) {
 				//throw new Exception("post keys not found");
@@ -19,7 +19,7 @@ public class Utility {
 		return true;
 	}
 	
-	public boolean checkIfStringAndNonEmpty(Map<String, Object> request, String... keys) throws Exception {
+	public boolean checkIfStringAndNonEmpty(Map<String, Object> request, String... keys) {
 		for (String key : keys)
 			if( !(request.get(key) instanceof String) || ((String) request.get(key)).trim().isEmpty() ) {
 				//throw new Exception("enter valid info" + " for " + key);
@@ -29,7 +29,7 @@ public class Utility {
 		return true;
 	}
 
-	public boolean checkIfPositiveValues(Map<String, Object> request, String... keys) throws Exception {
+	public boolean checkIfPositiveValues(Map<String, Object> request, String... keys)  {
 		for (String key : keys) {
 			if ((Integer) request.get(key) <= 0) {
 //				throw new Exception("enter valid info" + " for " + key);
@@ -40,7 +40,7 @@ public class Utility {
 		return true;
 	}
 
-	public boolean checkIfInteger(Map<String, Object> request, String... keys) throws Exception {
+	public boolean checkIfInteger(Map<String, Object> request, String... keys) {
 		for (String key : keys) {
 			if (!(request.get(key) instanceof Integer)) {
 				//throw new Exception("not an integer" + " for " + key);
@@ -51,7 +51,7 @@ public class Utility {
 		return true;
 	}
 
-	public boolean checkIfDateValid(String date) throws Exception {
+	public boolean checkIfDateValid(String date)  {
 		try {
 				LocalDate.parse(date);
 				return true;

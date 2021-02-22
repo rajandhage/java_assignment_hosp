@@ -32,7 +32,7 @@ public class PatientController {
 	}
 	
 	@PostMapping("/add")
-	public Map<String, Object> addPatient(@RequestBody Map<String, Object> request) throws Exception {
+	public Map<String, Object> addPatient(@RequestBody Map<String, Object> request) {
 		return patientService.addPatient(request);
 	}
 	

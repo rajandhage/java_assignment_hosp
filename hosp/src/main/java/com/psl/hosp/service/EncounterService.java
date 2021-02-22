@@ -48,7 +48,6 @@ public class EncounterService {
 	}
 
 	public Map<String, Object> addEncounter(Map<String, Object> request) throws Exception {
-		
 		Map<String, Object> returnMap = new HashMap<String, Object>();
 		if(!encounterServiceHelper.checkValidityOfRequestForAdd(request)) {
 			returnMap.put("status", HttpStatus.BAD_REQUEST);

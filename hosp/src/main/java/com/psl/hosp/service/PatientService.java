@@ -34,7 +34,7 @@ public class PatientService {
 		
 	}
 
-	public Map<String, Object> addPatient(Map<String, Object> request) throws Exception {
+	public Map<String, Object> addPatient(Map<String, Object> request){
 		Map<String, Object> map = new HashMap<String, Object>();
 		
 		if(!patientServiceHelper.checkValidityOfRequestForAdd(request)) {
