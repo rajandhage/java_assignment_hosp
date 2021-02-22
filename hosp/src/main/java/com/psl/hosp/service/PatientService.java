@@ -25,12 +25,19 @@ public class PatientService {
 	private PatientServiceHelper patientServiceHelper;
 	
 	public Map<String, Object> getAllPatients() {
-		List<Patient> patientList = new ArrayList<Patient>();
-		patientDao.findAll().forEach(patientList::add);
 		Map<String, Object> returnMap = new HashMap<String, Object>();
+		List<Patient> patientList = new ArrayList<Patient>();
+		try {
+		patientDao.findAll().forEach(patientList::add);
 		returnMap.put("statusCode", HttpStatus.OK);
 		returnMap.put("ListOfPatients", patientList);
 		return returnMap;
+		
+		} catch (Exception e) {
+			returnMap.put("statusCode", HttpStatus.INTERNAL_SERVER_ERROR);
+			returnMap.put("ListOfPatients", patientList);
+			return returnMap;
+		}
 		
 	}
 
@@ -114,7 +121,7 @@ public class PatientService {
 		
 	}
 
-	public Map<String, Object> updatePatient(Map<String, Object> request) throws Exception {
+	public Map<String, Object> updatePatient(Map<String, Object> request)  {
 		Map<String, Object> returnMap = new HashMap<String, Object>();
 		if(!patientServiceHelper.checkValidityOfRequestForUpdate(request)) {
 			returnMap.put("status", HttpStatus.BAD_REQUEST);
