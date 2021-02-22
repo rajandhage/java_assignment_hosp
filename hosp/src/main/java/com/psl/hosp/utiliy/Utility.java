@@ -62,7 +62,7 @@ public class Utility {
 		}
 	}
 				
-	public boolean checkIfTimeValid(String time) throws Exception {
+	public boolean checkIfTimeValid(String time)  {
 		try {
 				LocalTime.parse(time);
 				return true;
@@ -72,7 +72,7 @@ public class Utility {
 		}
 	}
 
-	public boolean checkIfString(Map<String, Object> request, String... keys) throws Exception {
+	public boolean checkIfString(Map<String, Object> request, String... keys)  {
 		// TODO Auto-generated method stub
 		for (String key : keys)
 			if( !(request.get(key) instanceof String)) {
@@ -84,7 +84,7 @@ public class Utility {
 		
 	}
 
-	public boolean checkIfFloat(Map<String, Object> request, String... keys) throws Exception {
+	public boolean checkIfFloat(Map<String, Object> request, String... keys)  {
 		// TODO Auto-generated method stub
 		for (String key : keys)
 			if (!((Double)request.get(key) instanceof Double)) {

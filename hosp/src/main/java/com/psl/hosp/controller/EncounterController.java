@@ -35,12 +35,12 @@ public class EncounterController {
 	}
 	
 	@PostMapping("/addEncounter")
-	public Map<String, Object> addEncounter(@RequestBody Map<String, Object> request) throws Exception{
+	public Map<String, Object> addEncounter(@RequestBody Map<String, Object> request){
 		return encounterService.addEncounter(request);
 	}
 	
 	@PutMapping("/updateEncounter")
-	public Map<String, Object> updateEncounter(@RequestBody Map<String, Object> request) throws Exception{
+	public Map<String, Object> updateEncounter(@RequestBody Map<String, Object> request){
 		return encounterService.updateEncounter(request);
 	}
 	

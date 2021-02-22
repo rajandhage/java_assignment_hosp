@@ -30,24 +30,41 @@ public class EncounterService {
 	
 	public Map<String, Object> getEncounterHistorybyPatient(int patientId) {
 		Map<String, Object> returnMap = new HashMap<String, Object>();
-		returnMap.put("statusCode", HttpStatus.OK);
-		returnMap.put("EncounterHistory" , encounterDao.findByPatientPatientId(patientId));
-		return returnMap;
+		try {
+			returnMap.put("statusCode", HttpStatus.OK);
+			returnMap.put("EncounterHistory" , encounterDao.findByPatientPatientId(patientId));
+			return returnMap;
+		} catch (Exception e) {
+			returnMap.put("statusCode", HttpStatus.INTERNAL_SERVER_ERROR);
+			return returnMap;
+			// TODO: handle exception
+		}
+		
+		
 	}
 
 	public Map<String, Object> getEncounterbyId(int encounterId) {
-		Optional<Encounter> encounter = encounterDao.findById(encounterId);
 		Map<String, Object> returnMap = new HashMap<String, Object>();
-		if(!encounter.isPresent()) {
-			returnMap.put("statusCode", HttpStatus.NOT_FOUND);
+		try {
+			Optional<Encounter> encounter = encounterDao.findById(encounterId);
+			if(!encounter.isPresent()) {
+				returnMap.put("statusCode", HttpStatus.NOT_FOUND);
+				return returnMap;
+			}
+			returnMap.put("statusCode", HttpStatus.OK);
+			returnMap.put("Encounter" ,encounter.get());
 			return returnMap;
+		} catch (Exception e) {
+			returnMap.put("statusCode", HttpStatus.INTERNAL_SERVER_ERROR);
+			return returnMap;
+			// TODO: handle exception
 		}
-		returnMap.put("statusCode", HttpStatus.OK);
-		returnMap.put("Encounter" ,encounter.get());
-		return returnMap;
+		
+		
+		
 	}
 
-	public Map<String, Object> addEncounter(Map<String, Object> request) throws Exception {
+	public Map<String, Object> addEncounter(Map<String, Object> request) {
 		Map<String, Object> returnMap = new HashMap<String, Object>();
 		if(!encounterServiceHelper.checkValidityOfRequestForAdd(request)) {
 			returnMap.put("status", HttpStatus.BAD_REQUEST);
@@ -108,7 +125,7 @@ public class EncounterService {
 
 
 
-	public Map<String, Object> updateEncounter(Map<String, Object> request) throws Exception {
+	public Map<String, Object> updateEncounter(Map<String, Object> request) {
 		Map<String, Object> returnMap = new HashMap<String, Object>();
 		if(!encounterServiceHelper.checkValidityOfRequestForUpdate(request)) {
 			returnMap.put("status", HttpStatus.BAD_REQUEST);

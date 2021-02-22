@@ -37,7 +37,7 @@ public class PatientController {
 	}
 	
 	@PutMapping("/update")
-	public Map<String, Object> updatePatient(@RequestBody Map<String, Object> request) throws Exception {
+	public Map<String, Object> updatePatient(@RequestBody Map<String, Object> request)  {
 		return patientService.updatePatient(request);
 	}
 	

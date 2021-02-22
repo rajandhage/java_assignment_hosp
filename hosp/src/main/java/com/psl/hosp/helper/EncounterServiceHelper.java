@@ -3,15 +3,18 @@ package com.psl.hosp.helper;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import com.psl.hosp.utiliy.Utility;
 
+
+@Component
 public class EncounterServiceHelper {
 
 	@Autowired
 	private Utility utility;
 	
-	public boolean checkValidityOfRequestForAdd(Map<String, Object> request) throws Exception {
+	public boolean checkValidityOfRequestForAdd(Map<String, Object> request)  {
 		return utility.checkKeys(request, "dateOfEncounter", "timeOfEncounter", "triggerIssue", "diagnosis", "medicines", "billingAmount", "patientId")
 		&& utility.checkIfStringAndNonEmpty(request, "triggerIssue")
 		&& utility.checkIfString(request, "diagnosis", "medicines")
@@ -22,7 +25,7 @@ public class EncounterServiceHelper {
 		
 	}
 
-	public boolean checkValidityOfRequestForUpdate(Map<String, Object> request) throws Exception {
+	public boolean checkValidityOfRequestForUpdate(Map<String, Object> request) {
 		return utility.checkKeys(request, "encounterId", "triggerIssue", "diagnosis", "medicines", "billingAmount")
 		&& utility.checkIfStringAndNonEmpty(request, "triggerIssue")
 		&& utility.checkIfString(request, "diagnosis", "medicines")
