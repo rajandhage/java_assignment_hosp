@@ -8,5 +8,5 @@ time_of_encounter time,
 trigger_issue VARCHAR(255),
 patient_id integer, 
 primary key (encounter_id),
-FOREIGN KEY (patient_id) REFERENCES patient(patient_id)
+FOREIGN KEY (patient_id) REFERENCES patient(patient_id) ON DELETE CASCADE ON UPDATE CASCADE
 );

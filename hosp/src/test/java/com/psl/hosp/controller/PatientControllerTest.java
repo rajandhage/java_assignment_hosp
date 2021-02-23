@@ -27,8 +27,6 @@ class PatientControllerTest {
 	@InjectMocks
 	PatientController patientController;
 	
-	
-	
 	@Test
 	void testAddPatient()  {
 		
@@ -174,6 +172,7 @@ class PatientControllerTest {
 		when(patientService.updatePatient(requestMap1)).thenReturn(returnMap1);
 		when(patientService.updatePatient(requestMap2)).thenReturn(returnMap2);
 		when(patientService.updatePatient(requestMap3)).thenReturn(returnMap3);
+		
 		
 		//test
 		assertEquals(HttpStatus.OK, patientController.updatePatient(requestMap1).get("statusCode"));

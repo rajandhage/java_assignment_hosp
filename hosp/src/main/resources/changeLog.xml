@@ -8,5 +8,6 @@
     <!-- Changes to include -->
     <include file="/db/changelog/app_table_a.sql"/>
     <include file="/db/changelog/app_table_b.sql"/>
+    <include file="/db/changelog/app_table_a_b_mapping.sql"/>
    
 </databaseChangeLog>

@@ -45,7 +45,7 @@ public class PatientService {
 		Map<String, Object> map = new HashMap<String, Object>();
 		
 		if(!patientServiceHelper.checkValidityOfRequestForAdd(request)) {
-			map.put("status", HttpStatus.BAD_REQUEST);
+			map.put("statusCode", HttpStatus.BAD_REQUEST);
 			map.put("message", "Check Request format for all expectations. Check console for error");
 			return map;
 		}
@@ -78,15 +78,20 @@ public class PatientService {
 			try {
 				map.put("statusCode", HttpStatus.CREATED);
 				map.put("message", "Patient added with PatientId : " + patientDao.save(patient).getPatientId());
-				
+				//map.put("message", "Patient added with PatientId : " + savePatient(patient).getPatientId());
 				return map;
 			}catch (Exception e) {
+				System.out.println(e);
 				map.put("statusCode", HttpStatus.INTERNAL_SERVER_ERROR);
 				map.put("message", "Error while adding patient in database");
 				return map;
 			}
 		}
 		
+	}
+	
+	public Patient savePatient(Patient patient) {
+		return patientDao.save(patient);
 	}
 
 	public Map<String, Object> getPatientById(int patientid){

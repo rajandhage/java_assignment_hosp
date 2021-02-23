@@ -8,7 +8,11 @@ import org.springframework.stereotype.Repository;
 
 import com.psl.hosp.model.Patient;
 
+import antlr.collections.List;
+
 @Repository
 public interface PatientDao extends CrudRepository<Patient, Integer>{
 	Optional<Patient> findByMailId(String mailId);
+	
+	
 }
