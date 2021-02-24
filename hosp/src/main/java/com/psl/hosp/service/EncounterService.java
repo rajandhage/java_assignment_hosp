@@ -92,7 +92,7 @@ public class EncounterService {
 		synchronized (encounter) {
 			try {
 				Encounter encounter2 = encounterDao.save(encounter);
-				returnMap.put("message", "Encounter added to database with encounterId : " + encounter2.getEncounterId() + "for patient with patientId : " + patientId);
+				returnMap.put("message", "Encounter added to database with encounterId : " + encounter2.getEncounterId() + " for patient with patientId : " + patientId);
 				returnMap.put("statusCode", HttpStatus.CREATED);
 				return returnMap;
 			} catch (Exception e) {
@@ -149,7 +149,7 @@ public class EncounterService {
 			try {
 				Encounter encounter2 = encounterDao.save(encounter);
 				returnMap.put("statusCode", HttpStatus.OK);
-				returnMap.put("message", "Encounter updated in database with encounterId : " + encounter2.getEncounterId() + "for patient with patientId : " + encounter2.getPatient().getPatientId());
+				returnMap.put("message", "Encounter updated in database with encounterId : " + encounter2.getEncounterId() + " for patient with patientId : " + encounter2.getPatient().getPatientId());
 				return  returnMap;
 			} catch (Exception e) {
 				returnMap.put("statusCode", HttpStatus.INTERNAL_SERVER_ERROR);

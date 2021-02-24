@@ -78,7 +78,6 @@ public class PatientService {
 			try {
 				map.put("statusCode", HttpStatus.CREATED);
 				map.put("message", "Patient added with PatientId : " + patientDao.save(patient).getPatientId());
-				//map.put("message", "Patient added with PatientId : " + savePatient(patient).getPatientId());
 				return map;
 			}catch (Exception e) {
 				System.out.println(e);
@@ -90,46 +89,58 @@ public class PatientService {
 		
 	}
 	
-	public Patient savePatient(Patient patient) {
-		return patientDao.save(patient);
-	}
+	
 
 	public Map<String, Object> getPatientById(int patientid){
-		Optional<Patient> patient = patientDao.findById(patientid);
 		Map<String, Object> returnMap = new HashMap<String, Object>();
-		if(patient.isPresent()) {
-			returnMap.put("statusCode", HttpStatus.OK);
-			returnMap.put("Patient" ,patient.get());
-			return returnMap;
-		}else {
-			returnMap.put("statusCode", HttpStatus.NOT_FOUND);
+		try {
+			Optional<Patient> patient = patientDao.findById(patientid);
+			if(patient.isPresent()) {
+				returnMap.put("statusCode", HttpStatus.OK);
+				returnMap.put("Patient" ,patient.get());
+				return returnMap;
+			}else {
+				returnMap.put("statusCode", HttpStatus.NOT_FOUND);
+				return returnMap;
+			}
+			
+		} catch (Exception e) {
+			returnMap.put("statusCode", HttpStatus.INTERNAL_SERVER_ERROR);
 			return returnMap;
 		}
+		
 	}
 
 	public Map<String, Object> deletePatient(int patientId) {
-		Optional<Patient> patient = patientDao.findById(patientId);
-		Map<String, Object> returnMap = new HashMap<String, Object>();
 		
-		if(patient.isPresent()) {
-			synchronized (patient) {
-				patientDao.deleteById(patientId);
+		Map<String, Object> returnMap = new HashMap<String, Object>();
+		try {
+			Optional<Patient> patient = patientDao.findById(patientId);
+			if(patient.isPresent()) {
+				synchronized (patient) {
+					patientDao.deleteById(patientId);
+				}
+				returnMap.put("statusCode", HttpStatus.OK);
+				returnMap.put("message", "Deleted");
+				return returnMap;
+			}else {
+				returnMap.put("statusCode", HttpStatus.NOT_FOUND);
+				returnMap.put("message", "No patient with patientId " + patientId +" is present");
+				return returnMap;
 			}
-			returnMap.put("statusCode", HttpStatus.OK);
-			returnMap.put("message", "Deleted");
-			return returnMap;
-		}else {
-			returnMap.put("statusCode", HttpStatus.NOT_FOUND);
-			returnMap.put("message", "No patient with patientId " + patientId +" is present");
+			
+		} catch (Exception e) {
+			returnMap.put("statusCode", HttpStatus.INTERNAL_SERVER_ERROR);
 			return returnMap;
 		}
+		
 		
 	}
 
 	public Map<String, Object> updatePatient(Map<String, Object> request)  {
 		Map<String, Object> returnMap = new HashMap<String, Object>();
 		if(!patientServiceHelper.checkValidityOfRequestForUpdate(request)) {
-			returnMap.put("status", HttpStatus.BAD_REQUEST);
+			returnMap.put("statusCode", HttpStatus.BAD_REQUEST);
 			returnMap.put("message", "Check Request format for all expectations. Check console for error");
 			return returnMap;
 		}
@@ -166,7 +177,6 @@ public class PatientService {
 				returnMap.put("message", "update failed due to database error");
 				return returnMap;
 			}
-			
 		}
 	}
 

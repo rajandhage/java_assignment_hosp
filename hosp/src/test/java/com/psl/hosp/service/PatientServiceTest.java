@@ -2,7 +2,9 @@ package com.psl.hosp.service;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -120,8 +122,91 @@ class PatientServiceTest {
 		Patient patient1 = new Patient("firstName1", "lastName1", LocalDate.parse("2000-12-12"), "b+ve", "+91 8380997285", "firstname1_lastname1@gmail.com", "Single", "Software Engineer", "address1", "city1", "district", "state", 415415);
 		patient1.setPatientId(1);
 		Optional<Patient> patient = Optional.of(patient1);
+		//when patient is present
 		when(patientDao.findById(1)).thenReturn(patient);
 		assertEquals(HttpStatus.OK, patientService.getPatientById(1).get("statusCode"));
-	}
+		verify(patientDao).findById(1);
+		
+		//when patient is not present
+		patient = Optional.empty();
+		when(patientDao.findById(1)).thenReturn(patient);
+		assertEquals(HttpStatus.NOT_FOUND, patientService.getPatientById(1).get("statusCode"));
+		//verify(patientDao).findById(1);
 
+		//when database error occures
+		patient = Optional.of(patient1);
+		when(patientDao.findById(1)).thenThrow(JDBCConnectionException.class);
+		assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, patientService.getPatientById(1).get("statusCode"));
+
+	}
+	
+	@Test
+	void testDeletePatientById() {
+		Patient patient1 = new Patient("firstName1", "lastName1", LocalDate.parse("2000-12-12"), "b+ve", "+91 8380997285", "firstname1_lastname1@gmail.com", "Single", "Software Engineer", "address1", "city1", "district", "state", 415415);
+		patient1.setPatientId(1);
+		
+		//when there is database error while deleting
+		Optional<Patient> patient = Optional.of(patient1);
+		when(patientDao.findById(1)).thenReturn(patient);
+		doThrow(JDBCConnectionException.class).when(patientDao).deleteById(1);
+		assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, patientService.deletePatient(1).get("statusCode"));
+		
+		//when there is no object of for given patientId
+		patient = Optional.empty();
+		when(patientDao.findById(1)).thenReturn(patient);
+		assertEquals(HttpStatus.NOT_FOUND, patientService.deletePatient(1).get("statusCode"));
+	}
+	
+	@Test
+	void testUpdatePatient() {
+		Patient patient = new Patient("firstNameOld", "lastNameOld", LocalDate.parse("2000-12-12"), "b+ve", "+91 8380997285", "firstname1_lastname1@gmail.com", "Single", "ocupation Old", "address1", "city1", "district1", "state1", 415415);
+		patient.setPatientId(1);
+		
+		
+        Map<String, Object> requestMap1 = new HashMap<String, Object>();
+        requestMap1.put("patientId", 1);
+        requestMap1.put("firstName", "firstName1");
+        requestMap1.put("lastName" , "lastName1");
+        requestMap1.put("bloodGroup" , "b+ve");
+        requestMap1.put("contactNumber" , "+91 8380997285");
+        requestMap1.put("mailId" , "firstname1_lastname1@gmail.com");
+        requestMap1.put("maritalStatus" , "Single");
+        requestMap1.put("occupation" , "Software Engineer");
+        requestMap1.put("address" , "address1");
+        requestMap1.put("city" ,  "city1");
+        requestMap1.put("district" , "district1");
+        requestMap1.put("state" , "state1");
+        requestMap1.put("dateOfBirth" , "2000-12-12");
+        requestMap1.put("pinCode" , 415415);
+		Patient returnPatient1 = new Patient("firstName", "lastName", LocalDate.parse("2000-12-12"), "b+ve", "+91 8380997285", "firstname1_lastname1@gmail.com", "Single", "Software Engineer", "address1", "city1", "district1", "state1", 415415);
+
+        //when patient is updated successfuly
+		Optional<Patient> optionalPatient = Optional.of(patient);
+        when(patientServiceHelper.checkValidityOfRequestForUpdate(requestMap1)).thenReturn(true);
+        when(patientDao.findById(any(Integer.class))).thenReturn(optionalPatient);
+		when(patientDao.save(any(Patient.class))).thenReturn(returnPatient1);
+		assertEquals(HttpStatus.OK, patientService.updatePatient(requestMap1).get("statusCode"));
+		verify(patientDao).save(any(Patient.class));
+		
+        //when patient is update fails due to no presence of patient data
+		optionalPatient = Optional.empty();
+		when(patientServiceHelper.checkValidityOfRequestForUpdate(requestMap1)).thenReturn(true);
+		when(patientDao.findById(any(Integer.class))).thenReturn(optionalPatient);
+		assertEquals(HttpStatus.NOT_FOUND, patientService.updatePatient(requestMap1).get("statusCode"));
+		//verify(patientDao).save(any(Patient.class));
+		
+		//when patient update fails due to bad request
+		optionalPatient = Optional.empty();
+		when(patientServiceHelper.checkValidityOfRequestForUpdate(requestMap1)).thenReturn(false);
+        assertEquals(HttpStatus.BAD_REQUEST, patientService.updatePatient(requestMap1).get("statusCode"));
+		verify(patientDao).save(any(Patient.class));
+		
+		//when patient update fails due to database error
+		optionalPatient = Optional.of(returnPatient1);
+		when(patientServiceHelper.checkValidityOfRequestForUpdate(requestMap1)).thenReturn(true);
+		when(patientDao.findById(any(Integer.class))).thenReturn(optionalPatient);
+		when(patientDao.save(any(Patient.class))).thenThrow(JDBCConnectionException.class);
+		assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, patientService.updatePatient(requestMap1).get("statusCode"));
+	
+	}
 }
