@@ -5,6 +5,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -67,6 +68,8 @@ class PatientServiceTest {
 		List<Patient> listOfPatients = (List<Patient>) returnValue.get("ListOfPatients");
 		assertEquals(3, listOfPatients.size());
 		verify(patientDao).findAll();
+		
+		
 	}
 	
 	@Test
@@ -94,20 +97,17 @@ class PatientServiceTest {
         when(patientDao.findByMailId(any(String.class))).thenReturn(optionalPatient);
 		when(patientDao.save(any(Patient.class))).thenReturn(returnPatient1);
 		assertEquals(HttpStatus.CREATED, patientService.addPatient(requestMap1).get("statusCode"));
-		verify(patientDao).save(any(Patient.class));
 		
         //when patient is added fails due to already presence of probably same patient data
 		optionalPatient = Optional.of(returnPatient1);
 		when(patientServiceHelper.checkValidityOfRequestForAdd(requestMap1)).thenReturn(true);
         when(patientDao.findByMailId(any(String.class))).thenReturn(optionalPatient);
 		assertEquals(HttpStatus.NOT_FOUND, patientService.addPatient(requestMap1).get("statusCode"));
-		verify(patientDao).save(any(Patient.class));
 		
 		//when patient added fails due to bad request
 		optionalPatient = Optional.empty();
 		when(patientServiceHelper.checkValidityOfRequestForAdd(requestMap1)).thenReturn(false);
         assertEquals(HttpStatus.BAD_REQUEST, patientService.addPatient(requestMap1).get("statusCode"));
-		verify(patientDao).save(any(Patient.class));
 		
 		//when patient added fails due to database error
 		when(patientServiceHelper.checkValidityOfRequestForAdd(requestMap1)).thenReturn(true);
@@ -115,6 +115,8 @@ class PatientServiceTest {
 		when(patientDao.save(any(Patient.class))).thenThrow(JDBCConnectionException.class);
 		assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, patientService.addPatient(requestMap1).get("statusCode"));
 		
+		//verify(patientDao).save(any(Patient.class));
+
 	}
 	
 	@Test
@@ -125,7 +127,6 @@ class PatientServiceTest {
 		//when patient is present
 		when(patientDao.findById(1)).thenReturn(patient);
 		assertEquals(HttpStatus.OK, patientService.getPatientById(1).get("statusCode"));
-		verify(patientDao).findById(1);
 		
 		//when patient is not present
 		patient = Optional.empty();
@@ -137,6 +138,8 @@ class PatientServiceTest {
 		patient = Optional.of(patient1);
 		when(patientDao.findById(1)).thenThrow(JDBCConnectionException.class);
 		assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, patientService.getPatientById(1).get("statusCode"));
+
+		verify(patientDao, times(3)).findById(any(Integer.class));
 
 	}
 	
@@ -155,6 +158,9 @@ class PatientServiceTest {
 		patient = Optional.empty();
 		when(patientDao.findById(1)).thenReturn(patient);
 		assertEquals(HttpStatus.NOT_FOUND, patientService.deletePatient(1).get("statusCode"));
+		
+		verify(patientDao, times(2)).findById(any(Integer.class));
+		verify(patientDao, times(1)).deleteById(any(Integer.class));
 	}
 	
 	@Test
@@ -186,20 +192,17 @@ class PatientServiceTest {
         when(patientDao.findById(any(Integer.class))).thenReturn(optionalPatient);
 		when(patientDao.save(any(Patient.class))).thenReturn(returnPatient1);
 		assertEquals(HttpStatus.OK, patientService.updatePatient(requestMap1).get("statusCode"));
-		verify(patientDao).save(any(Patient.class));
 		
         //when patient is update fails due to no presence of patient data
 		optionalPatient = Optional.empty();
 		when(patientServiceHelper.checkValidityOfRequestForUpdate(requestMap1)).thenReturn(true);
 		when(patientDao.findById(any(Integer.class))).thenReturn(optionalPatient);
 		assertEquals(HttpStatus.NOT_FOUND, patientService.updatePatient(requestMap1).get("statusCode"));
-		//verify(patientDao).save(any(Patient.class));
 		
 		//when patient update fails due to bad request
 		optionalPatient = Optional.empty();
 		when(patientServiceHelper.checkValidityOfRequestForUpdate(requestMap1)).thenReturn(false);
         assertEquals(HttpStatus.BAD_REQUEST, patientService.updatePatient(requestMap1).get("statusCode"));
-		verify(patientDao).save(any(Patient.class));
 		
 		//when patient update fails due to database error
 		optionalPatient = Optional.of(returnPatient1);
@@ -208,5 +211,8 @@ class PatientServiceTest {
 		when(patientDao.save(any(Patient.class))).thenThrow(JDBCConnectionException.class);
 		assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, patientService.updatePatient(requestMap1).get("statusCode"));
 	
+		verify(patientDao, times(2)).save(any(Patient.class));
+		verify(patientServiceHelper, times(4)).checkValidityOfRequestForUpdate(requestMap1);
+		verify(patientDao, times(3)).findById(any(Integer.class));
 	}
 }

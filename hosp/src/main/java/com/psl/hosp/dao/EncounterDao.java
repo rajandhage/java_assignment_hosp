@@ -1,5 +1,7 @@
 package com.psl.hosp.dao;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -13,4 +15,7 @@ import com.psl.hosp.model.Patient;
 @Repository
 public interface EncounterDao extends CrudRepository<Encounter, Integer>{
 	public List<Encounter> findByPatientPatientId(int patientId);
+
+	public Optional<Encounter> findByDateOfEncounterAndTimeOfEncounterAndPatientPatientId(LocalDate dateOfEncounter,
+			LocalTime timeOfEncounter, int patientId);
 }

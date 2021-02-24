@@ -67,7 +67,7 @@ public class EncounterService {
 	public Map<String, Object> addEncounter(Map<String, Object> request) {
 		Map<String, Object> returnMap = new HashMap<String, Object>();
 		if(!encounterServiceHelper.checkValidityOfRequestForAdd(request)) {
-			returnMap.put("status", HttpStatus.BAD_REQUEST);
+			returnMap.put("statusCode", HttpStatus.BAD_REQUEST);
 			returnMap.put("message", "Check Request format for all expectations . Check console for error");
 			return returnMap;
 		}
@@ -79,10 +79,17 @@ public class EncounterService {
 			returnMap.put("message", "No patient is present for patientId : " + patientId);
 			return returnMap;
 		}
-		
+		LocalDate dateOfEncounter = LocalDate.parse(request.get("dateOfEncounter").toString().trim());
+		LocalTime timeOfEncounter = LocalTime.parse(request.get("timeOfEncounter").toString().trim());
+		Optional<Encounter> encouterData = encounterDao.findByDateOfEncounterAndTimeOfEncounterAndPatientPatientId(dateOfEncounter, timeOfEncounter, patientId);
+		if(encouterData.isPresent()) {
+			returnMap.put("statusCode", HttpStatus.FOUND);
+			returnMap.put("message", "Encounter of this time for patientId " + patientId + " already present");
+			return returnMap;
+		}
 		Encounter encounter = new Encounter(
-				LocalDate.parse(request.get("dateOfEncounter").toString().trim()), 
-				LocalTime.parse(request.get("timeOfEncounter").toString().trim()), 
+				dateOfEncounter, 
+				timeOfEncounter,
 				request.get("triggerIssue").toString().trim(),
 				request.get("diagnosis").toString().trim(),
 				request.get("medicines").toString().trim(),
@@ -128,7 +135,7 @@ public class EncounterService {
 	public Map<String, Object> updateEncounter(Map<String, Object> request) {
 		Map<String, Object> returnMap = new HashMap<String, Object>();
 		if(!encounterServiceHelper.checkValidityOfRequestForUpdate(request)) {
-			returnMap.put("status", HttpStatus.BAD_REQUEST);
+			returnMap.put("statusCode", HttpStatus.BAD_REQUEST);
 			returnMap.put("message", "Check Request format for all expectations. Check console for error");
 			return returnMap;
 		}
