@@ -115,7 +115,9 @@ class PatientServiceTest {
 		when(patientDao.save(any(Patient.class))).thenThrow(JDBCConnectionException.class);
 		assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, patientService.addPatient(requestMap1).get("statusCode"));
 		
-		//verify(patientDao).save(any(Patient.class));
+		verify(patientDao, times(2)).save(any(Patient.class));
+		verify(patientServiceHelper, times(4)).checkValidityOfRequestForAdd(requestMap1);
+		verify(patientDao, times(3)).findByMailId(any(String.class));
 
 	}
 	
